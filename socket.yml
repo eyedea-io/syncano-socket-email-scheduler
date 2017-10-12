@@ -14,23 +14,18 @@ classes:
   scheduled_emails:
     - name: token
       type: string
-      description: Token used to manage reminder. Can be used to cancel reminder.
     - name: template
       type: string
-      description: Name of template that generator should return.
     - name: payload
       type: object
-      description: Data passed to generator endpoint.
     - name: is_canceled
       type: boolean
-      description: If true then reminder is not send.
     - name: sent_reminders
       type: integer
     - name: reminded_at
       type: datetime
     - name: interval
       type: integer
-      description: Numer of minutes between each reminder.
 
 event_handlers:
   schedule.interval.1_minute:
@@ -47,4 +42,4 @@ endpoints:
         type: string
         description: Token of email reminder.
   test:
-    file: test.js
+    file: t.js
