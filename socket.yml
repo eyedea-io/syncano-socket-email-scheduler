@@ -1,6 +1,6 @@
 name: email-scheduler
 description: Schedule your emails and remind about them.
-version: 0.0.4
+version: 0.0.5
 config:
   EMAIL_SENDER_ENDPOINT:
     required: true
@@ -8,12 +8,10 @@ config:
       This should be in format socket_name/endpoint_name. Given endpoint will
       receive email template name, data required to compile template, and token.
       That endpoint is responsible for sending email.
-
 event_handlers:
   schedule.interval.30_seconds:
     file: process.js
     description: Process scheduled emails and send reminders.
-
 classes:
   scheduled_emails:
     - name: token
@@ -34,7 +32,6 @@ classes:
       type: datetime
     - name: interval
       type: integer
-
 endpoints:
   schedule:
     description: Schedule email reminders.
