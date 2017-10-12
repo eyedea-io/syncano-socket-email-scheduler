@@ -1,34 +1,39 @@
 name: email-scheduler
 description: Schedule your emails and remind about them.
 version: 0.0.3
+
 config:
-  EMAIL_GENERATOR_ENDPOINT:
+  EMAIL_SENDER_ENDPOINT:
     required: true
     long_description: |
       This should be in format socket_name/endpoint_name. Given endpoint will
-      receive email template name and data required to compile template. It must
-      return email html and additional attachments.
+      receive email template name, data required to compile template, and token.
+      That endpoint is responsible for sending email.
+
+event_handlers:
+  schedule.interval.30_seconds:
+    file: process.js
+    description: Process scheduled emails and send reminders.
+
 classes:
   scheduled_emails:
     - name: token
       type: string
+      filter_index: true
     - name: template
       type: string
     - name: payload
       type: object
     - name: is_canceled
       type: boolean
-    - name: sent_reminders
+      filter_index: true
+    - name: sent_emails
       type: integer
-    - name: reminded_at
+    - name: triggered_at
       type: datetime
     - name: interval
       type: integer
 
-event_handlers:
-  schedule.interval.1_minute:
-    file: remind.js
-    description: Process scheduled emails and send reminders.
 endpoints:
   schedule:
     description: Schedule email reminders.
@@ -37,7 +42,4 @@ endpoints:
     parameters:
       token:
         type: string
-        description: Token of email reminder.
-  test:
-    file: t.js
-    description: Test file
+        description: Token of email reminder
