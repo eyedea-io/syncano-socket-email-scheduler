@@ -1,20 +1,31 @@
 import Server from 'syncano-server'
 
 export default async ctx => {
-  const {data, socket} = new Server(ctx)
+  const {data, socket, logger} = new Server(ctx)
+  const {debug} = logger('email-scheduler@process:')
   const {EMAIL_SENDER_ENDPOINT} = ctx.config
   const schedules = await data.scheduled_emails
     .where('is_canceled', false)
     .list()
 
-  schedules.filter(isEmailScheduledToNow).forEach(schedule =>
-    socket.post(EMAIL_SENDER_ENDPOINT, getData(schedule)).then(() =>
-      data.scheduled_emails.where('token', schedule.token).update({
-        triggered_at: new Date().toISOString(),
-        sent_emails: schedule.sent_emails + 1
+  debug('start sending emails')
+
+  schedules.filter(isEmailScheduledToNow).forEach(schedule => {
+    debug('start sending email', schedule.template)
+    socket
+      .post(EMAIL_SENDER_ENDPOINT, getData(schedule))
+      .then(res => {
+        debug('email sent')
+
+        data.scheduled_emails.where('token', schedule.token).update({
+          triggered_at: new Date().toISOString(),
+          sent_emails: schedule.sent_emails + 1
+        })
       })
-    )
-  )
+      .catch(err => {
+        debug('failed to send email', err)
+      })
+  })
 
   /* ========================================================================== */
 
@@ -32,6 +43,7 @@ export default async ctx => {
 
   function getData (schedule) {
     return {
+      to: schedule.to,
       payload: schedule.payload,
       template: schedule.template,
       token: schedule.token

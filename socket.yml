@@ -21,6 +21,8 @@ classes:
       filter_index: true
     - name: template
       type: string
+    - name: to
+      type: string
     - name: payload
       type: object
     - name: is_canceled
