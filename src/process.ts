@@ -8,7 +8,7 @@ interface Args {
 class Endpoint extends S.Endpoint {
   async run(
     {data, socket, logger}: S.Core,
-    {args, config}: S.Context<Args>
+    {config}: S.Context<Args>
   ) {
 
     const {debug} = logger('email-scheduler@process:')
@@ -19,13 +19,13 @@ class Endpoint extends S.Endpoint {
 
     debug('start sending emails')
 
-    schedules.filter(isEmailScheduledToNow).forEach(schedule => {
+    schedules.filter(isEmailScheduledToNow).forEach(async schedule => {
       debug('start sending email', schedule.template)
-      socket
-        .post(EMAIL_SENDER_ENDPOINT, getData(schedule))
+
+      await socket
+        .post(EMAIL_SENDER_ENDPOINT,  getData(schedule))
         .then(res => {
           debug('email sent')
-
           data.scheduled_emails.where('token', schedule.token).update({
             triggered_at: new Date().toISOString(),
             sent_emails: schedule.sent_emails + 1,
