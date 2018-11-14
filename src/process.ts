@@ -14,8 +14,8 @@ class Endpoint extends S.Endpoint {
     const {debug} = logger('email-scheduler@process:')
     const {EMAIL_SENDER_ENDPOINT} = config
     const schedules = await data.scheduled_emails
-    .where('is_canceled', false)
-    .list()
+      .where('is_canceled', false)
+      .list()
 
     debug('start sending emails')
 
